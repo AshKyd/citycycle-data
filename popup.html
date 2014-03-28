@@ -1,0 +1,15 @@
+<h2>{{name}}</h2>
+<div class="status">
+	{{#if status.show}}
+	<dl>
+		<dt class="available">Available bikes</dt>
+		<dd class="available {{status.avClass}}">{{status.station.available}}</dd>
+		<dt class="free">Free spaces</dt>
+		<dd class="free {{status.freeClass}}">{{status.station.free}}</dd>
+	</dl>
+	{{else}}
+	{{#if status.closed}}<p class="red closed">Station Closed. You will not be able to check out or return bikes at this station. <a href="http://www.citycycle.com.au/News/CityCycle-Updates">More info &raquo;</a></p>{{/if}}
+	{{#if status.disconnected}}<p class="orange disconnected">Station Disconnected. We can't update station details.</p>{{/if}}
+	{{/if}}
+	<p class="updated">(Updated <span title="{{staatus.ts}}">{{status.updated}}</span>)</p>
+</div>
