@@ -8,7 +8,7 @@ var fs = require('fs');
 var moment = require('moment');
 var hbs = require('handlebars');
 
-var popupTemplate = hbs.compile(fs.readFileSync('popup.html','utf-8'));
+var popupTemplate = hbs.compile(fs.readFileSync(__dirname+'/popup.html','utf-8'));
 
 var opts = {
     trim: true,
@@ -19,12 +19,15 @@ var opts = {
 
 var geoJson = {
     "type": "FeatureCollection",
+    "properties": {
+        "created": moment().format()
+    },
     "features": []
 };
 
 var stationStatus = {};
 try{
-    stationStatus = JSON.parse(fs.readFileSync('laststatus.json'));
+    stationStatus = JSON.parse(fs.readFileSync(__dirname+'/laststatus.json'));
 } catch(e){
     //Oh well.
 }
@@ -124,9 +127,9 @@ var getStations = async.queue(function (station, callback) {
 
 // assign a callback
 getStations.drain = function() {
-    fs.writeFileSync('citycycle.json',JSON.stringify(geoJson));
-    fs.writeFileSync('laststatus.json',JSON.stringify(stationStatus));
-    fs.writeFileSync('archive/'+moment().format('YYYY-MM-DD')+'.json',JSON.stringify(stationStatus));
+    fs.writeFileSync(__dirname+'/citycycle.json',JSON.stringify(geoJson));
+    fs.writeFileSync(__dirname+'/laststatus.json',JSON.stringify(stationStatus));
+    fs.writeFileSync(__dirname+'/archive/'+moment().format('YYYY-MM-DD')+'.json',JSON.stringify(stationStatus));
 }
 
 getIndex();
