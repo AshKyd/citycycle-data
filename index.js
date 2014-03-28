@@ -1,4 +1,4 @@
-var index = 'http://data.gov.au/api/action/datastore_search?resource_id=31575e61-8524-4b4f-8471-156fe127878e';
+var index = 'http://www.citycycle.com.au/service/carto';
 var details = 'http://www.citycycle.com.au/service/stationdetails/brisbane/';
 
 var async = require('async');
@@ -46,16 +46,16 @@ function get(url,callback){
 }
 
 function getIndex(){
-    get(index,function(body){
-        var json = JSON.parse(body);
+    get(index,function(xml){
+        parseString(xml, opts, function (err, json) {
+            if(!json.carto){
+                console.error(new Date(),'Response returned but gave bad data.');
+                return;
+            }
 
-        if(!json.success || !json.result.records){
-            console.error(new Date(),'Response returned but gave bad data.');
-            return;
-        }
-
-        json.result.records.forEach(function(station){
-            getStations.push(station);
+            json.carto.markers.marker.forEach(function(station){
+                getStations.push(station.$);
+            });
         });
     });
 }
@@ -72,7 +72,7 @@ function number2color(number){
 
 var getStations = async.queue(function (station, callback) {
     console.log('requesting station',station.id);
-    get(details+station["Station No"],function(xml){
+    get(details+station.number,function(xml){
         if(!xml){
             xml = '<xml></xml>';
         }
@@ -106,16 +106,18 @@ var getStations = async.queue(function (station, callback) {
                 result = false;
             }
 
-            var stationName = station['Main Street'] + '/' + station['Cross Street'];
             geoJson.features.push({
                 "id": station['Station No'],
                 "type": "Feature",
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [Number(station.Longitude), Number(station.Latitude)]
+                    "coordinates": [Number(station.lat), Number(station.lng)]
                 },
                 "properties": {
-                    "description": popupTemplate({name:stationName,status:result}),
+                    "description": popupTemplate({
+                        station:station,
+                        status:result
+                    }),
                     "category": "citycycle/citycycle-"+statusIcon
                 }
             });
