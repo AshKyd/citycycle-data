@@ -71,7 +71,7 @@ function number2color(number){
 }
 
 var getStations = async.queue(function (station, callback) {
-    console.log('requesting station',station.id);
+    console.log('requesting station',station.number);
     get(details+station.number,function(xml){
         if(!xml){
             xml = '<xml></xml>';
@@ -107,11 +107,11 @@ var getStations = async.queue(function (station, callback) {
             }
 
             geoJson.features.push({
-                "id": station['Station No'],
+                "id": station.number,
                 "type": "Feature",
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [Number(station.lat), Number(station.lng)]
+                    "coordinates": [Number(station.lng), Number(station.lat)]
                 },
                 "properties": {
                     "description": popupTemplate({
