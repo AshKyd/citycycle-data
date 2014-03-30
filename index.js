@@ -80,7 +80,7 @@ var getStations = async.queue(function (station, callback) {
             var statusIcon = 'grey';
             if(result && result.station){
                 stationStatus[station.id] = result;
-                var time = moment(result.station.updated*1000);
+                var time = moment.unix(result.station.updated).zone('+10:00');
                 result.ts = time.format();
                 result.updated = time.format("ddd Do, hA");
 
@@ -131,7 +131,7 @@ var getStations = async.queue(function (station, callback) {
 getStations.drain = function() {
     fs.writeFileSync(__dirname+'/citycycle.json',JSON.stringify(geoJson));
     fs.writeFileSync(__dirname+'/laststatus.json',JSON.stringify(stationStatus));
-    fs.writeFileSync(__dirname+'/archive/'+moment().format('YYYY-MM-DD')+'.json',JSON.stringify(stationStatus));
+    fs.writeFileSync(__dirname+'/archive/'+moment().format('YYYY-MM-DD-HH-mm')+'.json',JSON.stringify(stationStatus));
 }
 
 getIndex();
